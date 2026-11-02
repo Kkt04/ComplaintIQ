@@ -1,4 +1,4 @@
-name: ComplaintFlow CI
+name: ComplaintIQ CI
 
 on:
   push:
@@ -11,16 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: complaint_user
-          POSTGRES_PASSWORD: complaint_secret
-          POSTGRES_DB: complaintflow
+      mongodb:
+        image: mongo:7.0
         ports:
-          - 5432:5432
+          - 27017:27017
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -49,16 +45,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -e . --no-build-isolation
 
-      - name: Run Alembic Migrations
-        env:
-          DATABASE_URL: postgresql+asyncpg://complaint_user:complaint_secret@localhost:5432/complaintflow
+      - name: Verify Python Syntax
         run: |
-          alembic upgrade head
+          python -m py_compile src/complaintiq/serving/app.py
 
-      - name: Run Pytest Suite
+      - name: Verify Seed Pipeline
         env:
-          DATABASE_URL: sqlite+aiosqlite:///test_ci.db
-          SECRET_KEY: ci_secret_key_testing_environment_only
+          MONGODB_URL: mongodb://localhost:27017
+          DATABASE_NAME: complaintiq_ci
         run: |
-          pytest -v
+          python scripts/seed_data.py
+
+      - name: Run Pytest Test Suite
+        env:
+          MONGODB_URL: mongodb://localhost:27017
+          DATABASE_NAME: complaintiq_ci
+        run: |
+          pytest -v --durations=10
