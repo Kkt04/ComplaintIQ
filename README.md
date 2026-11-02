@@ -2,6 +2,15 @@
 
 > **Production-minded NLP complaint triage platform processing Consumer Financial Protection Bureau (CFPB) complaints with strict confidence thresholds ($\tau = 0.85$), deterministic PII scrubbing, explainable B6 team routing, and human-in-the-loop exception handling.**
 
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://complaintiq-one.vercel.app)
+[![API Health](https://img.shields.io/badge/API-Operational-253c6d?style=for-the-badge)](https://complaintiq-one.vercel.app/health)
+[![OpenAPI Docs](https://img.shields.io/badge/Docs-Swagger-f2842f?style=for-the-badge)](https://complaintiq-one.vercel.app/docs)
+
+🌐 **Live Production Deployment:** [https://complaintiq-one.vercel.app](https://complaintiq-one.vercel.app)
+- **Interactive UI & Operations Console:** [https://complaintiq-one.vercel.app](https://complaintiq-one.vercel.app)
+- **Live Health & Telemetry:** [https://complaintiq-one.vercel.app/health](https://complaintiq-one.vercel.app/health)
+- **Interactive OpenAPI Specification:** [https://complaintiq-one.vercel.app/docs](https://complaintiq-one.vercel.app/docs)
+
 ---
 
 ## 1. Executive Summary & Problem Statement
