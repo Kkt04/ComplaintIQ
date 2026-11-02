@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComplaintIQ — Financial Complaint NLP Triage & B6 Routing Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b',
+            },
+            slate: {
+              850: '#151e2e',
+              950: '#0b0f19',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('landing')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">ComplaintIQ</span>
+          <span class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">v1.0 CFPB NLP</span>
+        </div>
+      </div>
+
+      <nav class="flex items-center space-x-2 sm:space-x-6 text-sm font-medium">
+        <button id="nav-overview-btn" onclick="switchView('landing')" class="text-slate-300 hover:text-white transition px-3 py-1.5 rounded-lg">Overview</button>
+        <button id="nav-demo-btn" onclick="scrollToDemo()" class="text-slate-300 hover:text-white transition px-3 py-1.5 rounded-lg">Live Triage</button>
+        <button id="nav-architecture-btn" onclick="scrollToArchitecture()" class="text-slate-300 hover:text-white transition px-3 py-1.5 rounded-lg">Architecture</button>
+        <button id="nav-console-btn" onclick="switchView('console')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition shadow-md shadow-indigo-500/20 flex items-center space-x-2">
+          <span>Operations Console</span>
+          <span id="header-review-badge" class="hidden px-1.5 py-0.2 text-[11px] font-bold rounded-full bg-amber-500 text-slate-950">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- VIEW 1: LANDING & DEMO SANDBOX -->
+  <main id="view-landing" class="flex-1">
+    
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden pt-16 pb-20 border-b border-slate-900 bg-gradient-to-b from-slate-900/50 via-slate-950 to-slate-950">
+      <div class="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+      
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <!-- Live System Badges -->
+        <div class="inline-flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs text-slate-400 mb-8 backdrop-blur-sm">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-emerald-400 font-semibold" id="sys-status">API Healthy</span>
+          </span>
+          <span class="text-slate-600">|</span>
+          <span>Confidence Gate <strong class="text-slate-200">τ = 0.85</strong></span>
+          <span class="text-slate-600">|</span>
+          <span>CFPB Taxonomy <strong class="text-slate-200">9 B6 Teams</strong></span>
+          <span class="text-slate-600">|</span>
+          <span id="db-badge-text">MongoDB Persisted</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-tight">
+          Autonomous Financial Complaint Triage & <span class="bg-gradient-to-r from-indigo-400 via-violet-300 to-indigo-200 bg-clip-text text-transparent">Confidence-Gated Routing</span>
+        </h1>
+        
+        <p class="mt-6 text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+          Ingesting CFPB consumer financial disputes with strict PII scrubbing, deterministic multi-target NLP inference, explainable B6 team routing, and automated diversion of low-confidence predictions to human review queues.
+        </p>
+
+        <!-- CTA Action Buttons -->
+        <div class="mt-10 flex flex-wrap justify-center gap-4">
+          <button onclick="scrollToDemo()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3.5 rounded-xl transition shadow-xl shadow-indigo-600/30 flex items-center gap-2">
+            <span>Test Live Interactive Demo</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          </button>
+          <button onclick="switchView('console')" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-semibold px-6 py-3.5 rounded-xl transition flex items-center gap-2">
+            <span>Open Operations Console</span>
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+
+        <!-- Metric highlights -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto text-left">
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Target Latency</div>
+            <div class="text-2xl font-bold text-white mt-1">&lt; 25 ms</div>
+            <div class="text-xs text-indigo-400 mt-1">High-throughput serving</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gate Safety τ</div>
+            <div class="text-2xl font-bold text-emerald-400 mt-1">0.85</div>
+            <div class="text-xs text-slate-400 mt-1">Below τ → Human Review</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Privacy Engine</div>
+            <div class="text-2xl font-bold text-violet-400 mt-1">100% Redacted</div>
+            <div class="text-xs text-slate-400 mt-1">SSN, PAN, Email, Phone</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Routing Protocol</div>
+            <div class="text-2xl font-bold text-amber-400 mt-1">B6 Verified</div>
+            <div class="text-xs text-slate-400 mt-1">Fraud & Priority Overrides</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Triage Demo Section -->
+    <section id="demo-section" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-white">Interactive Triage Sandbox</h2>
+        <p class="text-slate-400 mt-2 max-w-2xl mx-auto">
+          Submit raw financial complaint text to watch the live pipeline execute: PII scrubbing, NLP inference, confidence thresholding, and team assignment.
+        </p>
+      </div>
+
+      <!-- Presets Selector -->
+      <div class="mb-6">
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Load Sample CFPB Complaints:</label>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="loadPreset('debt')" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            1. Debt Harassment (High Confidence)
+          </button>
+          <button onclick="loadPreset('fraud')" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            2. High Priority Fraud (Override Rule)
+          </button>
+          <button onclick="loadPreset('lowconf')" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            3. Ambiguous Text (Confidence Gate Trigger)
+          </button>
+          <button onclick="loadPreset('mortgage')" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            4. Escrow Foreclosure Risk (Critical)
+          </button>
+          <button onclick="loadPreset('creditcard')" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            5. Credit Card Billing Dispute
+          </button>
+        </div>
+      </div>
+
+      <!-- Demo Grid: Input & Output -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Input Form (5 cols) -->
+        <div class="lg:col-span-5 bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-semibold text-slate-200">Incoming Complaint Narrative</span>
+            <span id="char-counter" class="text-xs text-slate-500">0 / 10000 chars</span>
+          </div>
+          
+          <textarea id="complaint-input" rows="8" class="w-full bg-slate-950 text-slate-100 rounded-xl p-4 text-sm border border-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-mono leading-relaxed resize-none" placeholder="Paste or type a financial consumer complaint narrative here (minimum 20 characters)..."></textarea>
+          
+          <div class="mt-4 flex items-center justify-between">
+            <span class="text-xs text-slate-500">Includes PII scrubber test (SSN, Email, Card)</span>
+            <button id="triage-submit-btn" onclick="executeTriage()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+              <span id="triage-spinner" class="hidden animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+              <span id="triage-btn-text">Execute Triage</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Real-time Pipeline Execution & Results (7 cols) -->
+        <div class="lg:col-span-7 bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm min-h-[460px] flex flex-col justify-between">
+          <div id="results-placeholder" class="text-center my-auto py-12">
+            <div class="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center mx-auto mb-4 text-slate-500">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-slate-300">Awaiting Pipeline Execution</h3>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Select a preset above or input complaint text and click "Execute Triage" to visualize decisions.</p>
+          </div>
+
+          <!-- Active Result Container -->
+          <div id="results-container" class="hidden space-y-6">
+            
+            <!-- Header Badges -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-800">
+              <div>
+                <span class="text-xs font-semibold text-slate-400">Request ID:</span>
+                <span id="res-request-id" class="text-sm font-mono text-indigo-400 font-bold ml-1"></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="res-latency" class="text-xs text-slate-400"></span>
+                <span id="res-gate-pill" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+              </div>
+            </div>
+
+            <!-- Pipeline 5-Stage Stepper -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              <!-- Card 1: PII Redaction -->
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-400">1. Privacy & Redaction</span>
+                  <span id="res-pii-badge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full"></span>
+                </div>
+                <div id="res-redacted-text" class="text-xs font-mono text-slate-300 mt-2 p-2 bg-slate-900 rounded border border-slate-800/50 max-h-20 overflow-y-auto"></div>
+              </div>
+
+              <!-- Card 2: NLP Classification -->
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-400">2. NLP Product & Issue</span>
+                  <span id="res-model-badge" class="text-[10px] font-mono text-slate-400"></span>
+                </div>
+                <div class="mt-2 text-xs">
+                  <div class="text-slate-400">Product: <strong id="res-product" class="text-white"></strong></div>
+                  <div class="text-slate-400 mt-1">Issue: <strong id="res-issue" class="text-slate-200"></strong></div>
+                </div>
+              </div>
+
+              <!-- Card 3: Priority & Severity -->
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-400">3. Priority Assessment</span>
+                  <span id="res-priority-badge" class="text-xs font-bold px-2 py-0.5 rounded-full"></span>
+                </div>
+                <div id="res-priority-reason" class="text-xs text-slate-300 mt-2"></div>
+              </div>
+
+              <!-- Card 4: Confidence Gate -->
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-400">4. Confidence Gate (τ = 0.85)</span>
+                  <span id="res-conf-num" class="text-xs font-mono font-bold"></span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-2 mt-2">
+                  <div id="res-conf-bar" class="h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div id="res-gate-desc" class="text-[11px] text-slate-400 mt-1.5"></div>
+              </div>
+
+            </div>
+
+            <!-- Card 5: Final Routing Decision Box -->
+            <div id="res-routing-box" class="p-4 rounded-xl border">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-xs uppercase font-bold tracking-wider text-slate-400">5. B6 Team Assignment</div>
+                  <div id="res-assigned-team" class="text-lg font-bold text-white mt-0.5"></div>
+                </div>
+                <span id="res-rule-id" class="text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-slate-300"></span>
+              </div>
+              <div id="res-routing-explanation" class="text-xs text-slate-300 mt-2 pt-2 border-t border-slate-800/50"></div>
+
+              <!-- Prompt Human Review Action if gated -->
+              <div id="res-human-action-box" class="hidden mt-4 pt-3 border-t border-amber-500/20 bg-amber-500/10 p-3 rounded-lg flex items-center justify-between">
+                <span class="text-xs text-amber-300">This request is waiting in Human Review Queue. Review now:</span>
+                <button onclick="openReviewModalFromDemo()" class="text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg transition shadow">
+                  Perform Human Review
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Architecture & B6 Routing Specifications -->
+    <section id="architecture-section" class="py-16 bg-slate-900/40 border-t border-slate-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-white">System Architecture & B6 Routing Specification</h2>
+          <p class="text-slate-400 mt-2 max-w-2xl mx-auto">
+            Deterministically routing CFPB consumer complaints across 9 specialized operational teams with automated fraud escalations.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold mb-4">01</div>
+            <h3 class="text-base font-bold text-white">Credit & Debt Operations</h3>
+            <ul class="text-xs text-slate-400 mt-3 space-y-2">
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span><strong>Debt Collection Team:</strong> Harassment, dispute validation</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span><strong>Credit Card Team:</strong> APR, prepaid, billing disputes</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span><strong>Credit Reporting Team:</strong> Bureau corrections, FCRA</li>
+            </ul>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold mb-4">02</div>
+            <h3 class="text-base font-bold text-white">Loans & Banking Units</h3>
+            <ul class="text-xs text-slate-400 mt-3 space-y-2">
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><strong>Mortgage Team:</strong> Foreclosure, escrow calculations</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><strong>Bank Accounts Team:</strong> Overdraft, deposit accounts</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><strong>Auto Loan Team:</strong> Leases, vehicle repossession</li>
+            </ul>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition">
+            <div class="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 text-violet-400 flex items-center justify-center font-bold mb-4">03</div>
+            <h3 class="text-base font-bold text-white">Payments, Lending & Overrides</h3>
+            <ul class="text-xs text-slate-400 mt-3 space-y-2">
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span><strong>Payments Team:</strong> Remittance, wire, crypto services</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span><strong>Consumer Lending Team:</strong> Payday, title, personal loans</li>
+              <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span><strong class="text-rose-300">Fraud and Risk Override:</strong> High-priority identity theft</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- FSM Flow diagram -->
+        <div class="mt-8 p-6 rounded-2xl bg-slate-900 border border-slate-800 text-center">
+          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Confidence Gate & Human-in-the-Loop Finite State Machine</div>
+          <div class="flex flex-wrap items-center justify-center gap-3 text-xs font-mono">
+            <span class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Raw Narrative</span>
+            <span>&rarr;</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-800 text-indigo-300 border border-indigo-800">PII Redaction</span>
+            <span>&rarr;</span>
+            <span class="px-3 py-1.5 rounded-lg bg-slate-800 text-blue-300 border border-blue-800">NLP Inference</span>
+            <span>&rarr;</span>
+            <span class="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/30">Gate Evaluation (τ = 0.85)</span>
+            <span>&rarr;</span>
+            <span class="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Conf &ge; τ: Auto Route</span>
+            <span class="text-slate-600">/</span>
+            <span class="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/30">Conf &lt; τ: Human Review Queue</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- VIEW 2: OPERATIONS CONSOLE (FULL ENTERPRISE DASHBOARD) -->
+  <div id="view-console" class="hidden flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    
+    <!-- Console Header & Refresh -->
+    <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+          <span>Operations Console</span>
+          <span class="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Live Production Queue</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time complaint monitoring, queue management, and operator human-in-the-loop review.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="refreshConsoleData()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Refresh Data</span>
+        </button>
+        <button onclick="switchView('landing')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+          &larr; Back to Landing
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-xs font-medium text-slate-400 uppercase">Total Requests Ingested</div>
+        <div id="kpi-total" class="text-2xl font-bold text-white mt-1">0</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Persisted in MongoDB</div>
+      </div>
+      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-xs font-medium text-slate-400 uppercase">Automation Rate</div>
+        <div id="kpi-auto-rate" class="text-2xl font-bold text-indigo-400 mt-1">0%</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Directly routed without review</div>
+      </div>
+      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-xs font-medium text-slate-400 uppercase">Pending Human Review</div>
+        <div id="kpi-pending-review" class="text-2xl font-bold text-amber-400 mt-1">0</div>
+        <div class="text-[11px] text-amber-500/80 mt-0.5">Awaiting triage specialist</div>
+      </div>
+      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-xs font-medium text-slate-400 uppercase">Avg Model Confidence</div>
+        <div id="kpi-avg-conf" class="text-2xl font-bold text-emerald-400 mt-1">0.00</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Threshold τ = 0.85</div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="mt-8 p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Queue Filter -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Queue Filter</label>
+          <select id="filter-queue" onchange="fetchRequestsTable()" class="bg-slate-950 text-slate-200 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-indigo-500">
+            <option value="">All Queues</option>
+            <option value="Human Review Queue">Human Review Queue (Pending)</option>
+            <option value="Fraud and Risk">Fraud and Risk</option>
+            <option value="Debt Collection Team">Debt Collection Team</option>
+            <option value="Credit Card Team">Credit Card Team</option>
+            <option value="Mortgage Team">Mortgage Team</option>
+            <option value="Bank Accounts Team">Bank Accounts Team</option>
+            <option value="Credit Reporting Team">Credit Reporting Team</option>
+            <option value="Student Loan Team">Student Loan Team</option>
+            <option value="Auto Loan Team">Auto Loan Team</option>
+            <option value="Payments Team">Payments Team</option>
+            <option value="Consumer Lending Team">Consumer Lending Team</option>
+          </select>
+        </div>
+
+        <!-- Priority Filter -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Priority</label>
+          <select id="filter-priority" onchange="fetchRequestsTable()" class="bg-slate-950 text-slate-200 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-indigo-500">
+            <option value="">All Priorities</option>
+            <option value="CRITICAL">CRITICAL</option>
+            <option value="HIGH">HIGH</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="LOW">LOW</option>
+          </select>
+        </div>
+
+        <!-- Review Status Filter -->
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Review Status</label>
+          <select id="filter-status" onchange="fetchRequestsTable()" class="bg-slate-950 text-slate-200 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-indigo-500">
+            <option value="">All Statuses</option>
+            <option value="PENDING">PENDING (In Review)</option>
+            <option value="CORRECTED">CORRECTED</option>
+            <option value="CONFIRMED">CONFIRMED</option>
+            <option value="NOT_REQUIRED">NOT_REQUIRED (Automated)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Search Input -->
+      <div class="w-full sm:w-64">
+        <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Search ID or Text</label>
+        <div class="relative">
+          <input type="text" id="search-query" onkeyup="if(event.key==='Enter') fetchRequestsTable()" placeholder="e.g. req_ or keyword..." class="w-full bg-slate-950 text-slate-200 text-xs rounded-lg pl-8 pr-3 py-2 border border-slate-800 focus:outline-none focus:border-indigo-500">
+          <svg class="w-4 h-4 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requests Table -->
+    <div class="mt-6 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950/60 uppercase text-[10px] tracking-wider text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-4">Request ID</th>
+              <th class="py-3 px-4">Preview</th>
+              <th class="py-3 px-4">Product Classification</th>
+              <th class="py-3 px-4">Priority</th>
+              <th class="py-3 px-4">Confidence</th>
+              <th class="py-3 px-4">Assigned Team</th>
+              <th class="py-3 px-4">Review Status</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="requests-tbody" class="divide-y divide-slate-800/60">
+            <tr>
+              <td colspan="8" class="text-center py-12 text-slate-500">Loading requests...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+        <span id="pagination-info">Showing 0 of 0</span>
+        <div class="flex items-center space-x-2">
+          <button id="prev-page-btn" onclick="prevPage()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 disabled:opacity-40" disabled>Previous</button>
+          <span id="page-num-display" class="px-2 font-mono">1</span>
+          <button id="next-page-btn" onclick="nextPage()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 disabled:opacity-40" disabled>Next</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL 1: REQUEST AUDIT JOURNEY MODAL -->
+  <div id="modal-journey" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>Complaint Journey Audit</span>
+            <span id="modal-req-id" class="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20"></span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5" id="modal-created-at"></p>
+        </div>
+        <button onclick="closeJourneyModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto flex-1 py-4 space-y-4">
+        <!-- Redacted Text Box -->
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Redacted Narrative (Zero PII)</div>
+          <div id="modal-redacted-text" class="p-3 rounded-xl bg-slate-950 text-slate-200 text-xs font-mono leading-relaxed border border-slate-800 max-h-36 overflow-y-auto"></div>
+        </div>
+
+        <!-- Metrics summary -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+            <span class="text-slate-500 block">Product</span>
+            <strong id="modal-prod" class="text-slate-200"></strong>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+            <span class="text-slate-500 block">Confidence</span>
+            <strong id="modal-conf" class="text-indigo-300 font-mono"></strong>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+            <span class="text-slate-500 block">Assigned Team</span>
+            <strong id="modal-team" class="text-emerald-400"></strong>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+            <span class="text-slate-500 block">Review Status</span>
+            <strong id="modal-status" class="text-amber-400"></strong>
+          </div>
+        </div>
+
+        <!-- Explanation box -->
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Routing Justification</span>
+          <p id="modal-explanation" class="text-xs text-slate-300 mt-1"></p>
+        </div>
+
+        <!-- Step-by-step Audit Timeline -->
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Immutable Processing Timeline</div>
+          <div id="modal-timeline-container" class="space-y-2 border-l-2 border-slate-800 ml-2 pl-4"></div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-slate-800 flex justify-end">
+        <button onclick="closeJourneyModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: HUMAN REVIEW & CORRECTION MODAL -->
+  <div id="modal-review" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div>
+          <h3 class="text-lg font-bold text-white">Human Review & Triage Correction</h3>
+          <p class="text-xs text-amber-400 mt-0.5">Prediction confidence below threshold &tau; requires human specialist decision.</p>
+        </div>
+        <button onclick="closeReviewModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="review-form" onsubmit="submitReviewAction(event)" class="mt-4 space-y-4">
+        <input type="hidden" id="review-req-id">
+
+        <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+          <span class="text-slate-400 block font-semibold">Complaint Excerpt:</span>
+          <p id="review-modal-excerpt" class="text-slate-300 font-mono mt-1 max-h-20 overflow-y-auto"></p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Human Decision Action</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="cursor-pointer p-3 rounded-lg border border-slate-800 bg-slate-950 hover:border-slate-700 flex items-center space-x-2">
+              <input type="radio" name="review_action" value="CORRECT" checked onchange="toggleCorrectionFields(true)" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="text-xs font-medium text-slate-200">Correct Product / Issue</span>
+            </label>
+            <label class="cursor-pointer p-3 rounded-lg border border-slate-800 bg-slate-950 hover:border-slate-700 flex items-center space-x-2">
+              <input type="radio" name="review_action" value="CONFIRM" onchange="toggleCorrectionFields(false)" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="text-xs font-medium text-slate-200">Accept Model Prediction</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Product selection dropdown for correction -->
+        <div id="correction-fields" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Corrected CFPB Financial Product</label>
+            <select id="review-product-select" class="w-full bg-slate-950 text-slate-200 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-indigo-500">
+              <option value="Debt collection">Debt collection &rarr; Debt Collection Team</option>
+              <option value="Credit card or prepaid card">Credit card or prepaid card &rarr; Credit Card Team</option>
+              <option value="Mortgage">Mortgage &rarr; Mortgage Team</option>
+              <option value="Student loan">Student loan &rarr; Student Loan Team</option>
+              <option value="Vehicle loan or lease">Vehicle loan or lease &rarr; Auto Loan Team</option>
+              <option value="Checking or savings account">Checking or savings account &rarr; Bank Accounts Team</option>
+              <option value="Money transfer, virtual currency, or money service">Money transfer, virtual currency &rarr; Payments Team</option>
+              <option value="Credit reporting, credit repair services, or other personal consumer reports">Credit reporting / repairs &rarr; Credit Reporting Team</option>
+              <option value="Payday loan, title loan, or personal loan">Payday loan, personal loan &rarr; Consumer Lending Team</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Correction Notes / Reason</label>
+            <textarea id="review-notes" rows="2" class="w-full bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 border border-slate-800 focus:outline-none focus:border-indigo-500" placeholder="Explain the justification for this classification correction..."></textarea>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Reviewer Operator ID</label>
+          <input type="text" id="review-operator-id" required value="operator_spec_01" class="w-full bg-slate-950 text-slate-200 text-xs rounded-lg px-3 py-2 border border-slate-800 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 flex justify-end gap-3">
+          <button type="button" onclick="closeReviewModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200">Cancel</button>
+          <button type="submit" id="submit-review-btn" class="px-5 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30">
+            Submit Decision & Re-Route
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>ComplaintIQ &copy; 2026. CFPB NLP Complaint Triage, Confidence Gating, and B6 Routing Platform.</div>
+      <div class="flex items-center space-x-4">
+        <a href="/docs" target="_blank" class="hover:text-indigo-400 transition">OpenAPI Docs</a>
+        <span>&bull;</span>
+        <a href="/redoc" target="_blank" class="hover:text-indigo-400 transition">ReDoc</a>
+        <span>&bull;</span>
+        <a href="/health" target="_blank" class="hover:text-indigo-400 transition">Health Status</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

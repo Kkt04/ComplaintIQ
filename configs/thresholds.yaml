@@ -1,0 +1,12 @@
+# Confidence Gate Configuration for ComplaintIQ
+# tau represents the minimum product classification confidence required for automated routing.
+# If product_confidence < tau, the request is diverted to Human Review Queue.
+
+product_confidence_threshold: 0.85
+issue_confidence_threshold: 0.70
+strict_mode: true
+
+fallback:
+  action: "HUMAN_REVIEW"
+  destination_team: "Human Review Queue"
+  reason: "Prediction confidence below configured threshold tau"

@@ -1,0 +1,29 @@
+# Model Configuration for ComplaintIQ
+model_version: "v1.0.0-stub"
+default_predictor_type: "STUB"  # Available: STUB, BASELINE, TRANSFORMER, ONNX
+
+supported_predictors:
+  - name: "STUB"
+    description: "Development mock predictor with deterministic financial classification"
+    version: "v1.0.0-stub"
+    latency_ms: 5
+
+  - name: "BASELINE"
+    description: "TF-IDF + LinearSVC baseline model for CFPB complaint classification"
+    version: "v1.2.0-baseline"
+    latency_ms: 25
+
+  - name: "TRANSFORMER"
+    description: "DistilRoBERTa fine-tuned on CFPB complaint narratives (Future Milestone)"
+    version: "v2.0.0-transformer"
+    latency_ms: 120
+
+  - name: "ONNX"
+    description: "Quantized ONNX Runtime deployment for high-throughput serving (Future Milestone)"
+    version: "v2.1.0-onnx"
+    latency_ms: 30
+
+metadata:
+  product_classes_count: 9
+  issue_classes_count: 65
+  primary_metric: "macro_f1"

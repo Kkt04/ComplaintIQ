@@ -1,0 +1,77 @@
+# ComplaintIQ B6 Team Routing Specification
+# Maps CFPB consumer financial products to dedicated internal resolution teams.
+
+routing_table_version: "2.1.0"
+
+# Standard product-to-team routing rules (case-insensitive product match)
+teams:
+  - id: "RULE_DEBT_COLLECTION"
+    product: "Debt collection"
+    destination_team: "Debt Collection Team"
+    description: "Debt disputes, harassment, collection verification"
+
+  - id: "RULE_CREDIT_CARD"
+    product: "Credit card or prepaid card"
+    destination_team: "Credit Card Team"
+    description: "Credit and prepaid card disputes, APR issues, rewards"
+
+  - id: "RULE_MORTGAGE"
+    product: "Mortgage"
+    destination_team: "Mortgage Team"
+    description: "Home loans, escrow calculations, refinancing, foreclosure"
+
+  - id: "RULE_STUDENT_LOAN"
+    product: "Student loan"
+    destination_team: "Student Loan Team"
+    description: "Federal and private student loans, repayment plans"
+
+  - id: "RULE_AUTO_LOAN"
+    product: "Vehicle loan or lease"
+    destination_team: "Auto Loan Team"
+    description: "Automobile financing, lease disputes, repossession"
+
+  - id: "RULE_BANK_ACCOUNTS"
+    product: "Checking or savings account"
+    destination_team: "Bank Accounts Team"
+    description: "Overdraft fees, deposit accounts, ATM disputes"
+
+  - id: "RULE_PAYMENTS"
+    product: "Money transfer, virtual currency, or money service"
+    destination_team: "Payments Team"
+    description: "Wire transfers, crypto services, remittance"
+
+  - id: "RULE_CREDIT_REPORTING"
+    product: "Credit reporting, credit repair services, or other personal consumer reports"
+    destination_team: "Credit Reporting Team"
+    description: "Bureau disputes, score errors, inaccurate trade lines"
+
+  - id: "RULE_CONSUMER_LENDING"
+    product: "Payday loan, title loan, or personal loan"
+    destination_team: "Consumer Lending Team"
+    description: "Short term lending, personal lines of credit"
+
+# High-priority and critical issue overrides:
+# Complaints with HIGH or CRITICAL priority matching fraud/identity indicators override standard product routing.
+overrides:
+  fraud_and_risk:
+    rule_id: "OVERRIDE_FRAUD_RISK"
+    destination_team: "Fraud and Risk"
+    applicable_priorities:
+      - "HIGH"
+      - "CRITICAL"
+    trigger_keywords:
+      - "fraud"
+      - "identity theft"
+      - "unauthorized"
+      - "scam"
+      - "impersonation"
+      - "hacked"
+      - "stolen identity"
+    description: "High-priority complaints with security/fraud risks are diverted immediately to Fraud and Risk team."
+
+  human_review_fallback:
+    rule_id: "OVERRIDE_GATE_FALLBACK"
+    destination_team: "Human Review Queue"
+    description: "Diverted when confidence gate triggers or unknown product encountered."
+
+default_team: "General Financial Support"

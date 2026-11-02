@@ -1,0 +1,18 @@
+# Data and Ingestion Validation Configuration
+validation:
+  min_char_length: 20
+  max_char_length: 10000
+  allowed_encodings:
+    - "utf-8"
+  strip_whitespace: true
+
+privacy:
+  redact_pii_before_prediction: true
+  supported_entities:
+    - "EMAIL"
+    - "PHONE_NUMBER"
+    - "SSN"
+    - "CREDIT_CARD_NUMBER"
+    - "ACCOUNT_NUMBER"
+  log_raw_narrative: false
+  store_redacted_only: false
