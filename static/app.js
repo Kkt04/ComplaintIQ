@@ -207,8 +207,8 @@ function renderTriageResult(data) {
   confBar.style.width = `${Math.min(100, Math.max(5, confPct))}%`;
 
   if (data.product_confidence >= data.threshold) {
-    confNum.className = "text-xs font-mono font-bold text-orange-400";
-    confBar.className = "h-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 shadow-sm shadow-orange-500/50";
+    confNum.className = "text-xs font-mono font-bold text-[#f2842f]";
+    confBar.className = "h-2 rounded-full bg-gradient-to-r from-[#f2842f] to-[#ff9848] shadow-sm shadow-[#f2842f]/40";
     gateDesc.textContent = `Confidence exceeds required threshold tau (${data.threshold}). Automated routing approved.`;
   } else {
     confNum.className = "text-xs font-mono font-bold text-amber-400";
@@ -330,18 +330,18 @@ function renderTableRows(items) {
     const preview = item.redacted_text.length > 55 ? item.redacted_text.substring(0, 55) + "..." : item.redacted_text;
 
     return `
-      <tr class="hover:bg-slate-850/80 transition">
-        <td class="py-3 px-4 font-mono font-bold text-orange-400">${item.request_id}</td>
-        <td class="py-3 px-4 text-slate-400 font-mono text-[11px] max-w-xs truncate" title="${escapeHtml(item.redacted_text)}">${escapeHtml(preview)}</td>
-        <td class="py-3 px-4 text-slate-200 font-medium">${escapeHtml(item.predicted_product)}</td>
+      <tr class="hover:bg-[#18253f] transition">
+        <td class="py-3 px-4 font-mono font-bold text-[#f2842f]">${item.request_id}</td>
+        <td class="py-3 px-4 text-slate-300 font-mono text-[11px] max-w-xs truncate" title="${escapeHtml(item.redacted_text)}">${escapeHtml(preview)}</td>
+        <td class="py-3 px-4 text-white font-medium">${escapeHtml(item.predicted_product)}</td>
         <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${pClass}">${item.priority}</span></td>
-        <td class="py-3 px-4 font-mono">${item.product_confidence.toFixed(2)}</td>
-        <td class="py-3 px-4 font-semibold ${item.assigned_team === 'Human Review Queue' ? 'text-amber-400' : 'text-slate-300'}">${escapeHtml(item.assigned_team)}</td>
+        <td class="py-3 px-4 font-mono font-medium">${item.product_confidence.toFixed(2)}</td>
+        <td class="py-3 px-4 font-semibold ${item.assigned_team === 'Human Review Queue' ? 'text-amber-400' : 'text-slate-200'}">${escapeHtml(item.assigned_team)}</td>
         <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${sClass}">${item.review_status}</span></td>
         <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-          <button onclick="openJourneyModal('${item.request_id}')" class="px-2.5 py-1 text-[11px] font-medium rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">Audit</button>
+          <button onclick="openJourneyModal('${item.request_id}')" class="px-2.5 py-1 text-[11px] font-medium rounded bg-[#253c6d] hover:bg-[#30497d] text-slate-200 transition">Audit</button>
           ${item.review_status === 'PENDING' ? `
-            <button onclick="openReviewModal('${item.request_id}', '${escapeHtml(item.predicted_product)}', '${escapeHtml(preview)}')" class="btn-neon-orange px-2.5 py-1 text-[11px] rounded transition">Review</button>
+            <button onclick="openReviewModal('${item.request_id}', '${escapeHtml(item.predicted_product)}', '${escapeHtml(preview)}')" class="btn-palette-orange px-2.5 py-1 text-[11px] rounded transition">Review</button>
           ` : ''}
         </td>
       </tr>
@@ -390,12 +390,12 @@ async function openJourneyModal(requestId) {
     if (timelineContainer && data.timeline) {
       timelineContainer.innerHTML = data.timeline.map(t => `
         <div class="relative pl-3 pb-2 text-xs">
-          <div class="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-orange-500 border-2 border-slate-900 shadow-sm shadow-orange-500/50"></div>
+          <div class="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-[#f2842f] border-2 border-[#0a0f1b] shadow-sm shadow-[#f2842f]/50"></div>
           <div class="flex items-center gap-2">
-            <span class="font-bold text-orange-400 uppercase">${t.stage}</span>
-            <span class="text-[10px] text-slate-500 font-mono">${new Date(t.timestamp).toLocaleTimeString()}</span>
+            <span class="font-bold text-[#f2842f] uppercase">${t.stage}</span>
+            <span class="text-[10px] text-slate-400 font-mono">${new Date(t.timestamp).toLocaleTimeString()}</span>
           </div>
-          <div class="text-[11px] text-slate-400 font-mono mt-0.5">${JSON.stringify(t.details)}</div>
+          <div class="text-[11px] text-slate-300 font-mono mt-0.5">${JSON.stringify(t.details)}</div>
         </div>
       `).join("");
     }

@@ -1,39 +1,53 @@
-/* Custom aesthetic enhancements with Vibrant Neon Orange Theme for ComplaintIQ */
+/* Custom aesthetic styles for ComplaintIQ
+   Color Palette from https://colorhunt.co/palette/253c6d30497d455b8af2842f
+   #253c6d (Deep Navy)
+   #30497d (Royal Steel Navy)
+   #455b8a (Slate Periwinkle)
+   #f2842f (Warm Tangerine Sunset)
+*/
+
+:root {
+  --color-navy: #253c6d;
+  --color-steel: #30497d;
+  --color-slate: #455b8a;
+  --color-orange: #f2842f;
+  --color-orange-glow: #ff9848;
+}
 
 @layer utilities {
-  /* Custom scrollbar */
+  /* Custom scrollbar matching palette */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #070b14;
+    background: #090e18;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1e293b;
+    background: #253c6d;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #ff6600;
+    background: #f2842f;
   }
 }
 
-/* Glowing Neon Orange Animations */
+/* Glowing Animations */
 @keyframes neonPulse {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(255, 102, 0, 0.3), inset 0 0 10px rgba(255, 102, 0, 0.1);
+    box-shadow: 0 0 15px rgba(242, 132, 47, 0.3), inset 0 0 10px rgba(242, 132, 47, 0.1);
   }
   50% {
-    box-shadow: 0 0 30px rgba(255, 102, 0, 0.6), inset 0 0 15px rgba(255, 102, 0, 0.2);
+    box-shadow: 0 0 28px rgba(242, 132, 47, 0.55), inset 0 0 14px rgba(242, 132, 47, 0.2);
   }
 }
 
 @keyframes textGlowOrange {
   0%, 100% {
-    text-shadow: 0 0 15px rgba(255, 102, 0, 0.35);
+    text-shadow: 0 0 12px rgba(242, 132, 47, 0.35);
   }
   50% {
-    text-shadow: 0 0 25px rgba(255, 102, 0, 0.7);
+    text-shadow: 0 0 24px rgba(242, 132, 47, 0.65);
   }
 }
 
@@ -45,34 +59,27 @@
   animation: textGlowOrange 2.5s infinite ease-in-out;
 }
 
-.neon-orange-card {
-  border: 1px solid rgba(255, 102, 0, 0.25);
-  box-shadow: 0 4px 20px -2px rgba(255, 102, 0, 0.15);
-}
-
-.neon-orange-card:hover {
-  border-color: rgba(255, 102, 0, 0.5);
-  box-shadow: 0 8px 30px rgba(255, 102, 0, 0.25);
-}
-
-.btn-neon-orange {
-  background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
-  color: #070b14;
+.btn-palette-orange {
+  background: linear-gradient(135deg, #f2842f 0%, #ff9848 100%);
+  color: #080d17;
   font-weight: 700;
-  box-shadow: 0 0 20px rgba(255, 102, 0, 0.35);
+  box-shadow: 0 0 18px rgba(242, 132, 47, 0.35);
   transition: all 0.25s ease-in-out;
 }
 
-.btn-neon-orange:hover {
-  background: linear-gradient(135deg, #ff771a 0%, #ff994d 100%);
-  box-shadow: 0 0 30px rgba(255, 102, 0, 0.6);
+.btn-palette-orange:hover {
+  background: linear-gradient(135deg, #ff8f3d 0%, #ffa55c 100%);
+  box-shadow: 0 0 28px rgba(242, 132, 47, 0.55);
   transform: translateY(-1px);
 }
 
-/* Glassmorphism helpers */
-.glass-panel {
-  background: rgba(11, 15, 25, 0.85);
+.card-palette {
+  background: rgba(20, 30, 51, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 102, 0, 0.15);
+  border: 1px solid rgba(48, 73, 125, 0.45);
+}
+
+.card-palette:hover {
+  border-color: rgba(69, 91, 138, 0.7);
 }
